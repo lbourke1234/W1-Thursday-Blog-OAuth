@@ -34,8 +34,8 @@ export const verifyAccessToken = (token) =>
   )
 
 export const authenticateUser = async (author) => {
-  const accessToken = await generateAccessToken({ _id: user._id, role: user.role })
-  const refreshToken = await generateRefreshToken({ _id: user._id })
+  const accessToken = await generateAccessToken({ _id: author._id, role: author.role })
+  const refreshToken = await generateRefreshToken({ _id: author._id })
 
   author.refreshToken = refreshToken
   await author.save()

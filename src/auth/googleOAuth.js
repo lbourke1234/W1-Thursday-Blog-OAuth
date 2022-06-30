@@ -6,16 +6,16 @@ const googleStrategy = new GoogleStrategy(
   {
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: `${process.env.API_URL}/users/googleRedirect`
+    callbackURL: `${process.env.API_URL}/authors/googleRedirect`
   },
   async (_, __, profile, passportNext) => {
     try {
       const author = await AuthorsModel.findOne({ email: profile._json.email })
 
       if (author) {
-        const { accessToken } = await authenticateUser(author)
+        const { accessToken, refreshToken } = await authenticateUser(author)
 
-        passportNext(null, accessToken)
+        passportNext(null, { accessToken, refreshToken })
       } else {
         const { given_name, family_name, email } = profile._json
 
@@ -26,9 +26,9 @@ const googleStrategy = new GoogleStrategy(
           googleID: profile.id
         })
         const createdAuthor = await newAuthor.save()
-        const accessToken = await authenticateUser(createdAuthor)
+        const { accessToken, refreshToken } = await authenticateUser(createdAuthor)
 
-        passportNext(null, accessToken)
+        passportNext(null, { accessToken, refreshToken })
       }
     } catch (error) {
       console.log(error)
