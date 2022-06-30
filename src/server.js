@@ -10,12 +10,17 @@ import {
 import blogPostsRouter from './api/blogPosts/index.js'
 import authorsRouter from './api/authors/index.js'
 import listEndpoints from 'express-list-endpoints'
+import passport from 'passport'
+import googleStrategy from './auth/googleOAuth.js'
 
 const server = express()
 const port = process.env.PORT || 5001
 
+passport.use('google', googleStrategy)
+
 server.use(cors())
 server.use(express.json())
+server.use(passport.initialize())
 
 server.use('/blogPosts', blogPostsRouter)
 server.use('/authors', authorsRouter)
