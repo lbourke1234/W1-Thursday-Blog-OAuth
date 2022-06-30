@@ -5,8 +5,30 @@ import { basicAuthMiddleware } from '../../auth/basic.js'
 
 import { JWTAuthMiddleware } from '../../auth/token.js'
 import { generateAccessToken } from '../../auth/tools.js'
+import passport from 'passport'
 
 const authorsRouter = express.Router()
+
+authorsRouter.get(
+  '/googleLogin',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+)
+
+authorsRouter.get(
+  '/googleRedirect',
+  passport.authenticate('google', { session: false }),
+  (req, res, next) => {
+    try {
+      const { accessToken, refreshToken } = req.user
+      res.redirect(
+        `${process.env.FE_URL}/authors?accessToken=${accessToken}&refreshToken=${refreshToken}`
+      )
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  }
+)
 
 authorsRouter.get('/', JWTAuthMiddleware, async (req, res, next) => {
   try {
